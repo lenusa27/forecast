@@ -14,12 +14,11 @@ public class CurrentWeatherRepositoryTest {
     private final static String COUNTRY_CODE = "EE";
     private final static String CITY_LATITUDE = "59.436958";
     private final static String CITY_LONGITUDE = "24.753531";
-    private final static String UNITS = "metric";
 
     @Test
     public void shouldSendRequestByCityNameAndGetCorrectResponse() throws IOException {
         CurrentWeatherRepository currentWeatherRepository = new CurrentWeatherRepository();
-        WeatherRequest request = WeatherRequest.withCity(CITY_NAME, COUNTRY_CODE, UNITS);
+        WeatherRequest request = WeatherRequest.withCity(CITY_NAME, COUNTRY_CODE);
         CurrentWeather weather = currentWeatherRepository.getCurrentWeather(request);
 
         assertNotNull(weather);
@@ -32,7 +31,7 @@ public class CurrentWeatherRepositoryTest {
     @Test
     public void shouldSendRequestByCoordinatesNameAndGetCorrectResponse() throws IOException {
         CurrentWeatherRepository currentWeatherRepository = new CurrentWeatherRepository();
-        WeatherRequest request = WeatherRequest.withCoordinates(CITY_LATITUDE, CITY_LONGITUDE, UNITS);
+        WeatherRequest request = WeatherRequest.withCoordinates(CITY_LATITUDE, CITY_LONGITUDE);
         CurrentWeather weather = currentWeatherRepository.getCurrentWeather(request);
 
         assertNotNull(weather);

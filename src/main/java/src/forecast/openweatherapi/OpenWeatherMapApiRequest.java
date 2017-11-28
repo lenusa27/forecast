@@ -13,23 +13,26 @@ public class OpenWeatherMapApiRequest {
     }
 
     String urlParameters(String apiKey) {
-        String urlParameters = "";
+        StringBuilder urlParameters = new StringBuilder();
 
         if (resource != null) {
-            urlParameters += resource;
+            urlParameters.append(resource);
         }
 
         if (apiKey != null) {
-            urlParameters += "?appid=" + apiKey;
+            urlParameters.append("?appid=").append(apiKey);
         }
 
         if (parameters != null && !parameters.isEmpty()) {
-            for (Map.Entry parameter : parameters.entrySet()) {
-                urlParameters += "&" + parameter.getKey() + "=" + parameter.getValue();
+            for (Map.Entry<String, String> parameter : parameters.entrySet()) {
+                String value = parameter.getValue();
+                if (value != null) {
+                    urlParameters.append("&").append(parameter.getKey()).append("=").append(parameter.getValue());
+                }
             }
         }
 
-        return urlParameters;
+        return urlParameters.toString();
     }
 
 }

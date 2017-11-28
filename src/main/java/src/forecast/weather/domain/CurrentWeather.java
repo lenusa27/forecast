@@ -16,8 +16,12 @@ public class CurrentWeather extends Weather {
     public static CurrentWeather fromOpenWeatherMapApi(OpenWeatherMapApiResponse response) throws IOException {
         JsonNode jsonNode = response.jsonNode();
         CurrentWeather currentWeather = new CurrentWeather();
-        currentWeather.city = jsonNode.get("name").asText();
-        currentWeather.temperature = Temperature.fromJson(jsonNode.get("main"));
+        if (jsonNode.has("name")) {
+            currentWeather.city = jsonNode.get("name").asText();
+            currentWeather.temperature = Temperature.fromJson(jsonNode.get("main"));
+        } else {
+            throw new IllegalArgumentException("City is not found");
+        }
         return currentWeather;
     }
 

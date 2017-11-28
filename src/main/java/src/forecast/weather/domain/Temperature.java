@@ -34,4 +34,9 @@ public class Temperature {
         BigDecimal minTemperature = new BigDecimal(node.get("temp_min").asText());
         return new Temperature(currentTemperature, maxTemperature, minTemperature);
     }
+    
+    @Override
+    public String toString() {
+        return "[Current temp: " + (current != null ? current : "none") + "; Max temp: " + maximum + "; Min temp: " + minimum + "]";
+    }
 }

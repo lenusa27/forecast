@@ -11,12 +11,11 @@ public class ForecastRepositoryTest {
 
     private final static String CITY_NAME = "Tallinn";
     private final static String COUNTRY_CODE = "EE";
-    private final static String UNITS = "metric";
 
     @Test
     public void shouldSendRequestAndGetCorrectResponse() throws IOException {
         ForecastRepository forecastRepository = new ForecastRepository();
-        WeatherRequest request = WeatherRequest.withCity(CITY_NAME, COUNTRY_CODE, UNITS);
+        WeatherRequest request = WeatherRequest.withCity(CITY_NAME, COUNTRY_CODE);
         Forecast forecast = forecastRepository.getForecast(request);
 
         assertNotNull(forecast);

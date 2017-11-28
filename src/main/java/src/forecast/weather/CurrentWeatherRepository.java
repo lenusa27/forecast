@@ -1,5 +1,6 @@
 package src.forecast.weather;
 
+import src.forecast.logger.FileLogger;
 import src.forecast.openweatherapi.OpenWeatherMapApi;
 import src.forecast.openweatherapi.OpenWeatherMapApiRequest;
 import src.forecast.openweatherapi.OpenWeatherMapApiResponse;
@@ -16,17 +17,23 @@ public class CurrentWeatherRepository {
     private OpenWeatherMapApi openWeatherMapApi = new OpenWeatherMapApi();
 
     public CurrentWeather getCurrentWeather(WeatherRequest weatherRequest) throws IOException {
+    	logInput(weatherRequest);
+    	
         Map<String, String> parameters = currentWeatherRequestParameters(weatherRequest);
         OpenWeatherMapApiRequest request = new OpenWeatherMapApiRequest(CURRENT_WEATHER_RESOURCE, parameters);
         OpenWeatherMapApiResponse response = openWeatherMapApi.send(request);
-        return CurrentWeather.fromOpenWeatherMapApi(response);
+        CurrentWeather currentWeather = CurrentWeather.fromOpenWeatherMapApi(response);
+        
+        logOutput(currentWeather);
+        
+        return currentWeather;
     }
 
     private Map<String, String> currentWeatherRequestParameters(WeatherRequest weatherRequest) {
         Map<String, String> parameters = new HashMap<>();
 
-        if (weatherRequest.cityName() != null && weatherRequest.countryCode() != null) {
-            parameters.put("q", weatherRequest.cityName() + "," + weatherRequest.countryCode());
+        if (weatherRequest.cityName() != null) {
+            parameters.put("q", weatherRequest.cityQuery());
         } else if (weatherRequest.latitude() != null && weatherRequest.longitude() != null) {
             parameters.put("lat", weatherRequest.latitude());
             parameters.put("lon", weatherRequest.longitude());
@@ -34,5 +41,14 @@ public class CurrentWeatherRepository {
         parameters.put("units", weatherRequest.units());
         return parameters;
     }
+    
+    private void logInput(WeatherRequest weatherRequest) {
+    	String cityOrCoordinates = weatherRequest.cityName() != null ? weatherRequest.cityName() : weatherRequest.latitude() + ":" + weatherRequest.longitude();
+    	FileLogger.input("Getting current weather for city: " + cityOrCoordinates);
+	}
+	
+	private void logOutput(CurrentWeather currentWeather) {
+    	FileLogger.output("Current weather in " + currentWeather.city() + " - " + currentWeather.temperature());
+	}
 
 }
