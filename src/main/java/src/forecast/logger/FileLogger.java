@@ -1,43 +1,31 @@
 package src.forecast.logger;
 
 import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
+import static java.time.LocalDateTime.now;
 
 public class FileLogger {
 	
-	private static final String INPUT = "input";
-	private static final String OUTPUT = "output";
+	private static final String INPUT_FILE = "input.txt";
 	
-	private static Logger inputLogger = Logger.getLogger(INPUT);
-	private static Logger outputLogger = Logger.getLogger(OUTPUT);
-	
-	static {
-		try {
-			setupLogger(inputLogger, INPUT + ".txt");
-			setupLogger(outputLogger, OUTPUT + ".txt");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void input(String content) throws IOException {
+		writeTo(INPUT_FILE, content);
 	}
 	
-	private static void setupLogger(Logger logger, String fileName) throws IOException {
-		FileHandler fileHandler = new FileHandler(fileName, true);
-		fileHandler.setFormatter(new LoggerFormatter());
-		
-		logger.setLevel(Level.INFO);
-		logger.addHandler(fileHandler);
+	public void output(String fileName, String content) throws IOException {
+		writeTo(fileName, content);
 	}
 	
-	public static void input(String info) {
-		inputLogger.info(info);
+	private void writeTo(String fileName, String content) throws IOException {
+		String formatted = format(content);
+		Files.write(Paths.get(fileName), formatted.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 	}
 	
-	public static void output(String info) {
-		outputLogger.info(info);
+	private String format(String info) {
+		return now() + " - " + info + "\n";
 	}
-	
-	
 	
 }

@@ -11,11 +11,10 @@ public class OpenWeatherMapApiResponse {
 
     public JsonNode jsonNode() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(jsonBody);
-        return jsonNode;
+        return objectMapper.readTree(jsonBody);
     }
 
-    static OpenWeatherMapApiResponse withJsonBody(String jsonBody) {
+    public static OpenWeatherMapApiResponse withJsonBody(String jsonBody) {
         OpenWeatherMapApiResponse response = new OpenWeatherMapApiResponse();
         response.jsonBody = jsonBody;
         return response;

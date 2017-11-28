@@ -14,8 +14,14 @@ public class CurrentWeatherRepository {
 
     private static final String CURRENT_WEATHER_RESOURCE = "weather";
 
-    private OpenWeatherMapApi openWeatherMapApi = new OpenWeatherMapApi();
-
+    private OpenWeatherMapApi openWeatherMapApi;
+	private FileLogger fileLogger;
+    
+	public CurrentWeatherRepository(OpenWeatherMapApi openWeatherMapApi, FileLogger fileLogger) {
+		this.openWeatherMapApi = openWeatherMapApi;
+		this.fileLogger = fileLogger;
+	}
+	
     public CurrentWeather getCurrentWeather(WeatherRequest weatherRequest) throws IOException {
     	logInput(weatherRequest);
     	
@@ -33,7 +39,7 @@ public class CurrentWeatherRepository {
         Map<String, String> parameters = new HashMap<>();
 
         if (weatherRequest.cityName() != null) {
-            parameters.put("q", weatherRequest.cityQuery());
+            parameters.put("q", weatherRequest.citySearchQuery());
         } else if (weatherRequest.latitude() != null && weatherRequest.longitude() != null) {
             parameters.put("lat", weatherRequest.latitude());
             parameters.put("lon", weatherRequest.longitude());
@@ -42,13 +48,16 @@ public class CurrentWeatherRepository {
         return parameters;
     }
     
-    private void logInput(WeatherRequest weatherRequest) {
+    private void logInput(WeatherRequest weatherRequest) throws IOException {
     	String cityOrCoordinates = weatherRequest.cityName() != null ? weatherRequest.cityName() : weatherRequest.latitude() + ":" + weatherRequest.longitude();
-    	FileLogger.input("Getting current weather for city: " + cityOrCoordinates);
+    	String content = "Getting current weather for city: " + cityOrCoordinates;
+    	fileLogger.input(content);
 	}
 	
-	private void logOutput(CurrentWeather currentWeather) {
-    	FileLogger.output("Current weather in " + currentWeather.city() + " - " + currentWeather.temperature());
+	private void logOutput(CurrentWeather currentWeather) throws IOException {
+    	String fileName = currentWeather.city() + ".txt";
+    	String content = "Current weather in " + currentWeather.cityAsText() + " - " + currentWeather.temperature();
+    	fileLogger.output(fileName, content);
 	}
 
 }

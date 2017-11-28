@@ -29,7 +29,7 @@ public class WeatherRequest {
         return request;
     }
     
-    public String cityQuery() {
+    public String citySearchQuery() {
         return cityName + (countryCode != null ? "," + countryCode : "");
     }
 

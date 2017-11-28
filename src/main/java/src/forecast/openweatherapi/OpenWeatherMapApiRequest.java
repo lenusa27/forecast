@@ -1,5 +1,7 @@
 package src.forecast.openweatherapi;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 public class OpenWeatherMapApiRequest {
@@ -27,7 +29,12 @@ public class OpenWeatherMapApiRequest {
             for (Map.Entry<String, String> parameter : parameters.entrySet()) {
                 String value = parameter.getValue();
                 if (value != null) {
-                    urlParameters.append("&").append(parameter.getKey()).append("=").append(parameter.getValue());
+                    try {
+                        value = URLEncoder.encode(value, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        
+                    }
+                    urlParameters.append("&").append(parameter.getKey()).append("=").append(value);
                 }
             }
         }

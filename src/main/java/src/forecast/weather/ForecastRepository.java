@@ -4,11 +4,10 @@ import src.forecast.logger.FileLogger;
 import src.forecast.openweatherapi.OpenWeatherMapApi;
 import src.forecast.openweatherapi.OpenWeatherMapApiRequest;
 import src.forecast.openweatherapi.OpenWeatherMapApiResponse;
+import src.forecast.weather.domain.DayForecast;
 import src.forecast.weather.domain.Forecast;
-import src.forecast.weather.domain.Temperature;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,13 @@ public class ForecastRepository {
 
     private static final String FORECAST_RESOURCE = "forecast";
 
-    private OpenWeatherMapApi openWeatherMapApi = new OpenWeatherMapApi();
+    private OpenWeatherMapApi openWeatherMapApi;
+    private FileLogger fileLogger;
+    
+    public ForecastRepository(OpenWeatherMapApi openWeatherMapApi, FileLogger fileLogger) {
+        this.openWeatherMapApi = openWeatherMapApi;
+        this.fileLogger = fileLogger;
+    }
 
     public Forecast getForecast(WeatherRequest weatherRequest) throws IOException {
         logInput(weatherRequest);
@@ -33,24 +38,27 @@ public class ForecastRepository {
 
     private Map<String, String> forecastRequestParameters(WeatherRequest weatherRequest) {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("q", weatherRequest.cityQuery());
+        parameters.put("q", weatherRequest.citySearchQuery());
         parameters.put("units", weatherRequest.units());
         return parameters;
     }
 
-    private void logInput(WeatherRequest weatherRequest) {
+    private void logInput(WeatherRequest weatherRequest) throws IOException {
         String cityOrCoordinates = weatherRequest.cityName() != null ? weatherRequest.cityName() : weatherRequest.latitude() + ":" + weatherRequest.longitude();
-        FileLogger.input("Getting forecast for city: " + cityOrCoordinates);
+        String content = "Getting forecast for city: " + cityOrCoordinates;
+		fileLogger.input(content);
     }
 
-    private void logOutput(Forecast forecast) {
+    private void logOutput(Forecast forecast) throws IOException {
         StringBuilder output = new StringBuilder();
         
-        for (Map.Entry<LocalDate, Temperature> entry : forecast.days().entrySet()) {
-            output.append(entry.getKey()).append(": ").append(entry.getValue()).append(" | ");
+        for (DayForecast dayForecast : forecast.days()) {
+            output.append(dayForecast.date()).append(": ").append(dayForecast.temperature()).append(" | ");
         }
-        
-        FileLogger.output("Forecast in " + forecast.city() + " - " + output.toString());
+
+        String fileName = forecast.city() + ".txt";
+        String content = "Forecast in " + forecast.cityAsText() + " - " + output.toString();
+		fileLogger.output(fileName, content);
     }
 
 }

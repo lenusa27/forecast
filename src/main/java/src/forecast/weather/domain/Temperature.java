@@ -37,6 +37,14 @@ public class Temperature {
     
     @Override
     public String toString() {
-        return "[Current temp: " + (current != null ? current : "none") + "; Max temp: " + maximum + "; Min temp: " + minimum + "]";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[");
+        if (current != null) {
+            stringBuilder.append("Current temp: ").append(current).append("; ");
+        }
+        stringBuilder.append("Max temp: ").append(maximum).append("; ");
+        stringBuilder.append("Min temp: ").append(minimum);
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 }

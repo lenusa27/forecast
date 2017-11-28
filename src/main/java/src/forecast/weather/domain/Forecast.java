@@ -13,32 +13,50 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 
 public class Forecast extends Weather {
 
+    private static final int DAYS_WITH_FORECAST = 3; 
     private static DateTimeFormatter YYYY_MM_DD = ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private Map<LocalDate, Temperature> days = new HashMap<>();
+    private List<DayForecast> days = new ArrayList<>();
 
-    public Map<LocalDate, Temperature> days() {
+    public List<DayForecast> days() {
         return days;
     }
 
     public static Forecast fromOpenWeatherMapApi(OpenWeatherMapApiResponse response) throws IOException {
         JsonNode jsonNode = response.jsonNode();
         Forecast forecast = new Forecast();
-        forecast.city = jsonNode.get("city").get("name").asText();
-        JsonNode list = jsonNode.get("list");
+
+        if (jsonNode.has("city")) {
+            JsonNode cityNode = jsonNode.get("city");
+            forecast.city = cityNode.get("name").asText();
+            
+            JsonNode coordinates = cityNode.get("coord");
+            forecast.latitude = coordinates.get("lat").asText();
+            forecast.longitude = coordinates.get("lon").asText();
+            
+            forecast.days = daysForecast(jsonNode);
+        } else {
+            throw new IllegalArgumentException("City is not found");
+        }
+        return forecast;
+    }
+    
+    private static List<DayForecast> daysForecast(JsonNode node) {
+        List<DayForecast> dayForecasts = new ArrayList<>();
+        JsonNode list = node.get("list");
         if (list.isArray()) {
             String firstDate = list.get(0).get("dt_txt").asText();
             LocalDate localDate = LocalDate.parse(firstDate, YYYY_MM_DD);
 
-            for (int i = 0; i < 3; i ++) {
+            for (int i = 0; i < DAYS_WITH_FORECAST; i++) {
                 LocalDate day = localDate.plusDays(i);
-                forecast.days.put(day, dayTemperature(day, list));
+                dayForecasts.add(dayTemperature(day, list));
             }
         }
-        return forecast;
+        return dayForecasts;
     }
 
-    private static Temperature dayTemperature(LocalDate day, JsonNode list) {
+    private static DayForecast dayTemperature(LocalDate day, JsonNode list) {
         List<Temperature> dayTemperatures = new ArrayList<>();
         for (JsonNode node : list) {
             String dateString = node.get("dt_txt").asText();
@@ -59,6 +77,6 @@ public class Forecast extends Weather {
                 .min(Comparator.naturalOrder())
                 .orElse(null);
 
-        return new Temperature(null, dayMaxTemperature, dayMinTemperature);
+        return new DayForecast(day, new Temperature(null, dayMaxTemperature, dayMinTemperature));
     }
 }

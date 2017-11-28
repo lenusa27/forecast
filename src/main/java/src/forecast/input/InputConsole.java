@@ -1,5 +1,7 @@
 package src.forecast.input;
 
+import src.forecast.logger.FileLogger;
+import src.forecast.openweatherapi.OpenWeatherMapApi;
 import src.forecast.weather.CurrentWeatherRepository;
 import src.forecast.weather.ForecastRepository;
 import src.forecast.weather.WeatherRequest;
@@ -8,6 +10,9 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class InputConsole {
+	
+	private static OpenWeatherMapApi openWeatherMapApi = new OpenWeatherMapApi();
+	private static FileLogger fileLogger = new FileLogger();
 	
 	public static void main(String[] args) throws IOException {
 		Scanner scanner = new Scanner(System.in);
@@ -37,13 +42,13 @@ public class InputConsole {
 	}
 	
 	private static void currentWeather(String cityName) throws IOException {
-		CurrentWeatherRepository currentWeatherRepository = new CurrentWeatherRepository();
+		CurrentWeatherRepository currentWeatherRepository = new CurrentWeatherRepository(openWeatherMapApi, fileLogger);
 		WeatherRequest request = WeatherRequest.withCity(cityName);
 		currentWeatherRepository.getCurrentWeather(request);
 	}
 	
 	private static void forecast(String cityName) throws IOException {
-		ForecastRepository forecastRepository = new ForecastRepository();
+		ForecastRepository forecastRepository = new ForecastRepository(openWeatherMapApi, fileLogger);
 		WeatherRequest request = WeatherRequest.withCity(cityName);
 		forecastRepository.getForecast(request);
 	}

@@ -18,6 +18,11 @@ public class CurrentWeather extends Weather {
         CurrentWeather currentWeather = new CurrentWeather();
         if (jsonNode.has("name")) {
             currentWeather.city = jsonNode.get("name").asText();
+
+            JsonNode coordinates = jsonNode.get("coord");
+            currentWeather.latitude = coordinates.get("lat").asText();
+            currentWeather.longitude = coordinates.get("lon").asText();
+            
             currentWeather.temperature = Temperature.fromJson(jsonNode.get("main"));
         } else {
             throw new IllegalArgumentException("City is not found");
